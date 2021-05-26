@@ -57,7 +57,7 @@ fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
             to_range(rng.gen()),
             to_range(rng.gen()),
             to_range(rng.gen()));
-        let bound_function = bind_function(function, &coeffs);
+        let bound_function = bind_1(function, &coeffs);
 
         let bounds = find_bounds(&bound_function, 10000);
 
@@ -80,7 +80,7 @@ fn main() -> Result<(), image::ImageError> {
     let c = find_interesting_coeffs(&clifford_attractor);
 
     println!("Using coefficients: {}", c);
-    let f = bind_function(&clifford_attractor, &c);
+    let f = bind_1(&clifford_attractor, &c);
 
     let bounds = find_bounds(&f, 10000);
 
