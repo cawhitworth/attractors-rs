@@ -1,5 +1,5 @@
+use std::fmt;
 
-#[derive(Debug, Copy, Clone)]
 pub struct Coord {
     pub x: f64,
     pub y: f64
@@ -11,8 +11,8 @@ impl Coord {
     }
 }
 
-impl std::fmt::Display for Coord {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Coord {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({}, {})", self.x, self.y)
     }
 }
@@ -39,8 +39,8 @@ impl Rect {
     }
 }
 
-impl std::fmt::Display for Rect {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Rect {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[ {} -> {} ]", self.bl, self.tr)
     }
 }

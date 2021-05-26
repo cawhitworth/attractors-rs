@@ -1,3 +1,5 @@
+use std::cmp::{max, min};
+
 use image;
 use rand::prelude::*;
 
@@ -92,7 +94,7 @@ fn main() -> Result<(), image::ImageError> {
 
     for y in 0..h {
         for x in 0..w {
-            let c = std::cmp::max(0, std::cmp::min(bitmap.point(x,y), 255)) as u8;
+            let c = max(0, min(bitmap.point(x,y), 255)) as u8;
             image.put_pixel(x as u32, y as u32, image::Rgb([c, c, c]));
         }
     }
