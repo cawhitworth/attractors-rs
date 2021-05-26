@@ -24,3 +24,25 @@ pub fn bind_function<'a, T, S>(function: impl Fn(&T, &S) -> T + 'a, c: &'a S)
         -> impl Fn(&T) -> T + 'a {
     move |p| function(p,c)
 }
+
+pub fn find_bounds(f: &impl Fn(&Coord) -> Coord, iterations: usize) -> Rect {
+    let mut bounds = Rect::from_coords(0.0, 0.0, 0.0, 0.0);
+    let mut p = Coord::new(0.0, 0.0);
+
+    for _ in 0..iterations {
+        p = f(&p);
+
+        bounds.bl.x = if p.x < bounds.bl.x { p.x } else { bounds.bl.x };
+        bounds.bl.y = if p.y < bounds.bl.y { p.y } else { bounds.bl.y };
+        bounds.tr.x = if p.x > bounds.tr.x { p.x } else { bounds.tr.x };
+        bounds.tr.y = if p.y > bounds.tr.y { p.y } else { bounds.tr.y };
+    }
+
+    bounds.bl.x *= 1.05;
+    bounds.bl.y *= 1.05;
+    bounds.tr.x *= 1.05;
+    bounds.tr.y *= 1.05;
+
+    bounds
+
+}

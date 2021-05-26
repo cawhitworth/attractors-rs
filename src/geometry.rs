@@ -11,6 +11,12 @@ impl Coord {
     }
 }
 
+impl std::fmt::Display for Coord {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
 pub struct Rect {
     pub bl: Coord,
     pub tr: Coord,
@@ -30,5 +36,11 @@ impl Rect {
 
     pub fn height(&self) -> f64 {
         self.tr.y - self.bl.y
+    }
+}
+
+impl std::fmt::Display for Rect {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[ {} {} ]", self.bl, self.tr)
     }
 }

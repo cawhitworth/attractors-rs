@@ -11,7 +11,7 @@ use functions::*;
 
 fn expose(width: usize, height: usize, bounds: &Rect,
           iterations: usize,
-          function: impl Fn(&Coord) -> Coord) -> (DeepBitmap, u32) {
+          function: &impl Fn(&Coord) -> Coord) -> (DeepBitmap, u32) {
 
     let mut bitmap = DeepBitmap::new(width, height);
 
@@ -40,16 +40,19 @@ fn expose(width: usize, height: usize, bounds: &Rect,
     (bitmap, max_exposure)
 }
 
-fn main() -> Result<(), image::ImageError>{
+fn main() -> Result<(), image::ImageError> {
+
     let w = 1920;
     let h = 1080;
     let iters = 100000000;
     let c = Coeffs::new(1.79048,1.26424,1.90425,-1.33372);
-    let bounds = Rect::from_coords(-3.0, -2.5, 3.0, 2.2);
 
     let f = bind_function(clifford_attractor, &c);
+    let bounds = find_bounds(&f, 10000);
 
-    let (bitmap, max_exposure) = expose(w, h, &bounds,iters, f);
+    println!("Bounds: {}", bounds);
+
+    let (bitmap, max_exposure) = expose(w, h, &bounds,iters, &f);
 
     println!("Max exposure: {}", max_exposure);
 
