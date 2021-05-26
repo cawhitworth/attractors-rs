@@ -10,9 +10,10 @@ use bitmap::*;
 mod functions;
 use functions::*;
 
-fn expose(width: usize, height: usize, bounds: &Rect,
-          iterations: usize,
-          function: &impl Fn(&Coord) -> Coord) -> (DeepBitmap, u32) {
+fn expose<F>(width: usize, height: usize, bounds: &Rect,
+            iterations: usize,
+            function: &F) -> (DeepBitmap, u32)
+    where F: Fn(&Coord) -> Coord {
 
     let mut bitmap = DeepBitmap::new(width, height);
 
@@ -68,15 +69,15 @@ fn find_interesting_coeffs(function: &impl Fn(&Coord, &Coeffs) -> Coord) -> Coef
 
 fn main() -> Result<(), image::ImageError> {
 
-    let w = 1920;
-    let h = 1080;
+    let w = 1920*2;
+    let h = 1080*2;
     let iters = 100000000;
     
     println!("Finding interesting coefficients...");
     let c = find_interesting_coeffs(&clifford_attractor);
 
     println!("Using coefficients: {}", c);
-    let f = bind_function(clifford_attractor, &c);
+    let f = bind_function(&clifford_attractor, &c);
 
     let bounds = find_bounds(&f, 10000);
 

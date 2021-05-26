@@ -28,8 +28,8 @@ pub fn clifford_attractor(p: &Coord, coeffs: &Coeffs) -> Coord {
     }
 }
 
-pub fn bind_function<'a, T, S>(function: impl Fn(&T, &S) -> T + 'a, c: &'a S)
-        -> impl Fn(&T) -> T + 'a {
+pub fn bind_function<'a, T, S, F>(function: &'a F, c: &'a S) -> impl Fn(&T) -> T + 'a 
+    where F: Fn(&T, &S) -> T + 'a {
     move |p| function(p,c)
 }
 
