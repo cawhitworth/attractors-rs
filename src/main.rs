@@ -42,7 +42,8 @@ fn expose<F>(width: usize, height: usize, bounds: &Rect,
     (bitmap, max_exposure)
 }
 
-fn find_interesting_coeffs(function: &impl Fn(&Coord, &Coeffs) -> Coord) -> Coeffs {
+fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
+    where F: Fn(&Coord, &Coeffs) -> Coord {
     let mut rng = rand::thread_rng();
     let mut coeffs;
 

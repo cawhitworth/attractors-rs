@@ -28,9 +28,9 @@ pub fn clifford_attractor(p: &Coord, coeffs: &Coeffs) -> Coord {
     }
 }
 
-pub fn bind_function<'a, T, S, F>(function: &'a F, c: &'a S) -> impl Fn(&T) -> T + 'a 
-    where F: Fn(&T, &S) -> T + 'a {
-    move |p| function(p,c)
+pub fn bind_function<'a, T, U, F>(function: &'a F, u: &'a U) -> impl Fn(&T) -> T + 'a 
+    where F: Fn(&T, &U) -> T {
+    move |t| function(t,u)
 }
 
 pub fn find_bounds(f: &impl Fn(&Coord) -> Coord, iterations: usize) -> Rect {
