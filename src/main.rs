@@ -1,4 +1,5 @@
 use image;
+use rand::prelude::*;
 
 mod geometry;
 use geometry::*;
@@ -40,14 +41,44 @@ fn expose(width: usize, height: usize, bounds: &Rect,
     (bitmap, max_exposure)
 }
 
+fn find_interesting_coeffs(function: &impl Fn(&Coord, &Coeffs) -> Coord) -> Coeffs {
+    let mut rng = rand::thread_rng();
+    let mut coeffs;
+
+    let to_range: fn(f64) -> f64 = |x| (x * 4.0) * 2.0;
+
+    loop {
+        coeffs = Coeffs::new(
+            to_range(rng.gen()),
+            to_range(rng.gen()),
+            to_range(rng.gen()),
+            to_range(rng.gen()));
+        let bound_function = bind_function(function, &coeffs);
+
+        let bounds = find_bounds(&bound_function, 10000);
+
+        let (_, max_exposure) = expose(640, 512, &bounds, 10000, &bound_function);
+        if max_exposure < 10 {
+            println!("Max exposure: {}", max_exposure);
+            break;
+        }
+    } 
+
+    coeffs
+}
+
 fn main() -> Result<(), image::ImageError> {
 
     let w = 1920;
     let h = 1080;
     let iters = 100000000;
-    let c = Coeffs::new(1.79048,1.26424,1.90425,-1.33372);
+    
+    println!("Finding interesting coefficients...");
+    let c = find_interesting_coeffs(&clifford_attractor);
 
+    println!("{}", c);
     let f = bind_function(clifford_attractor, &c);
+
     let bounds = find_bounds(&f, 10000);
 
     println!("Bounds: {}", bounds);

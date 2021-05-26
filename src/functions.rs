@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::geometry::*;
 
 pub struct Coeffs {
@@ -10,6 +12,12 @@ pub struct Coeffs {
 impl Coeffs {
     pub fn new(a: f64, b: f64, c: f64, d: f64) -> Coeffs {
         Coeffs { a,b,c,d }
+    }
+}
+
+impl Display for Coeffs {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "[ a: {}, b: {}, c: {}, d: {} ]", self.a, self.b, self.c, self.d)
     }
 }
 
