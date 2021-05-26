@@ -45,7 +45,7 @@ fn find_interesting_coeffs(function: &impl Fn(&Coord, &Coeffs) -> Coord) -> Coef
     let mut rng = rand::thread_rng();
     let mut coeffs;
 
-    let to_range: fn(f64) -> f64 = |x| (x * 4.0) * 2.0;
+    let to_range: fn(f64) -> f64 = |x| (x * 4.0) - 2.0;
 
     loop {
         coeffs = Coeffs::new(
@@ -59,7 +59,6 @@ fn find_interesting_coeffs(function: &impl Fn(&Coord, &Coeffs) -> Coord) -> Coef
 
         let (_, max_exposure) = expose(640, 512, &bounds, 10000, &bound_function);
         if max_exposure < 10 {
-            println!("Max exposure: {}", max_exposure);
             break;
         }
     } 
@@ -76,7 +75,7 @@ fn main() -> Result<(), image::ImageError> {
     println!("Finding interesting coefficients...");
     let c = find_interesting_coeffs(&clifford_attractor);
 
-    println!("{}", c);
+    println!("Using coefficients: {}", c);
     let f = bind_function(clifford_attractor, &c);
 
     let bounds = find_bounds(&f, 10000);

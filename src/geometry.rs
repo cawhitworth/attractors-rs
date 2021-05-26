@@ -41,6 +41,6 @@ impl Rect {
 
 impl std::fmt::Display for Rect {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "[ {} {} ]", self.bl, self.tr)
+        write!(f, "[ {} -> {} ]", self.bl, self.tr)
     }
 }
