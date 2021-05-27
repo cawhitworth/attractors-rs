@@ -82,10 +82,11 @@ fn develop(bitmap: &DeepBitmap, max_exposure: u32, gamma: f64, gradient: &Gradie
     output
 }
 
-fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
+fn find_interesting_coeffs<F>(function: &F ) -> (Coeffs, Rect)
     where F: Fn(&Coord, &Coeffs) -> Coord {
 
     let mut coeffs;
+    let mut bounds;
 
     let mut rng = rand::thread_rng();
     let mut rand_coeff = || (rng.gen::<f64>() * 4.0) - 2.0;
@@ -96,7 +97,7 @@ fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
 
         let fn_with_coeffs = bind_1(function, &coeffs);
 
-        let bounds = find_bounds(&fn_with_coeffs, 10000);
+        bounds = find_bounds(&fn_with_coeffs, 10000);
 
         let (_, max_exposure) =
             expose(640, 512, &bounds, 10000, &fn_with_coeffs, false);
@@ -106,7 +107,7 @@ fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
         }
     } 
 
-    coeffs
+    (coeffs, bounds)
 }
 
 fn pick<T>(collection: &Vec<T>) -> &T {
@@ -126,14 +127,12 @@ fn main() -> Result<(), image::ImageError> {
    
     println!("Using {}", function_name);
     println!("Finding interesting coefficients...");
-    let c = find_interesting_coeffs(&function);
+    let (c, bounds) = find_interesting_coeffs(&function);
 
     println!("Using coefficients: {}", c);
-    let f = bind_1(&function, &c);
-
-    let bounds = find_bounds(&f, 10000);
-
     println!("Bounds: {}", bounds);
+
+    let f = bind_1(&function, &c);
 
     let (bitmap, max_exposure) =
         expose(w, h, &bounds,iters, &f, true);
