@@ -25,7 +25,7 @@ impl GradientPoint {
 }
 
 pub struct Gradient {
-   name: String,
+   pub name: String,
    points: Vec<GradientPoint> 
 }
 

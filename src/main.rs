@@ -1,4 +1,4 @@
-use std::{cmp::{max, min}, io::Write};
+use std::io::{Write, stdout};
 
 use image;
 use rand::prelude::*;
@@ -33,12 +33,12 @@ fn expose<F>(width: usize, height: usize, bounds: &Rect,
     let reset = iterations / 10;
 
     print!("Exposing");
-    std::io::stdout().flush().ok();
+    stdout().flush().ok();
 
     for iter in 0..iterations {
         if iter % reset == 0 {
             print!(".");
-            std::io::stdout().flush().ok();
+            stdout().flush().ok();
         }
 
         p = function(&p);
@@ -108,7 +108,7 @@ fn main() -> Result<(), image::ImageError> {
 
     let w = 1920*2;
     let h = 1080*2;
-    let iters = 100000000;
+    let iters = 500000000;
     
     println!("Finding interesting coefficients...");
     let c = find_interesting_coeffs(&clifford_attractor);
@@ -125,7 +125,12 @@ fn main() -> Result<(), image::ImageError> {
 
     println!("Max exposure: {}", max_exposure);
 
+    let palettes = palettes::get_palettes();
+    let palette_index: usize = rand::thread_rng().gen::<u32>() as usize % palettes.len();
+    let chosen_palette = &palettes[palette_index];
+    println!("Developing with palette {}", &chosen_palette.name);
+
     let image =
-        develop(&bitmap, max_exposure, 1.5, &palettes::get_palettes()[0]);
+        develop(&bitmap, max_exposure, 1.5, chosen_palette);
     image.save("output.png")
 }
