@@ -1,4 +1,4 @@
-use std::cmp::{max, min};
+use std::{cmp::{max, min}, io::Write};
 
 use image;
 use rand::prelude::*;
@@ -11,6 +11,11 @@ use bitmap::*;
 
 mod functions;
 use functions::*;
+
+mod colour;
+use colour::Gradient;
+
+mod palettes;
 
 fn expose<F>(width: usize, height: usize, bounds: &Rect,
             iterations: usize,
@@ -25,7 +30,17 @@ fn expose<F>(width: usize, height: usize, bounds: &Rect,
 
     let mut p = Coord::new(0.0, 0.0);
 
-    for _ in 0..iterations {
+    let reset = iterations / 10;
+
+    print!("Exposing");
+    std::io::stdout().flush().ok();
+
+    for iter in 0..iterations {
+        if iter % reset == 0 {
+            print!(".");
+            std::io::stdout().flush().ok();
+        }
+
         p = function(&p);
         let plot_x = ((p.x - bounds.bl.x) * x_scale) as usize;
         let plot_y = ((p.y - bounds.bl.y) * y_scale) as usize;
@@ -40,28 +55,47 @@ fn expose<F>(width: usize, height: usize, bounds: &Rect,
             bitmap.plot(plot_x, plot_y, sampled);
         }
     }
-
+    println!();
     (bitmap, max_exposure)
+}
+
+fn develop(bitmap: &DeepBitmap, max_exposure: u32, gamma: f64, gradient: &Gradient) -> image::RgbImage {
+    let mut output = image::RgbImage::new(bitmap.width as u32, bitmap.height as u32);
+
+    let max_exposure_f = max_exposure as f64;
+    for y in 0..bitmap.height {
+        for x in 0..bitmap.width {
+            let sample = bitmap.point(x, y);
+            let exposure = sample as f64 / max_exposure_f;
+            let gamma_corrected = exposure.powf(1.0 / gamma);
+            let clamped = if gamma_corrected < 0.0 { 0.0 } else if gamma_corrected > 1.0 { 1.0 } else { gamma_corrected }; 
+            let colour = gradient.colour_at(clamped);
+            output.put_pixel(x as u32, y as u32, colour);
+        }
+    }
+
+    output
 }
 
 fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
     where F: Fn(&Coord, &Coeffs) -> Coord {
-    let mut rng = rand::thread_rng();
+
     let mut coeffs;
 
-    let to_range: fn(f64) -> f64 = |x| (x * 4.0) - 2.0;
+    let mut rng = rand::thread_rng();
+    let mut rand_coeff = || (rng.gen::<f64>() * 4.0) - 2.0;
 
     loop {
-        coeffs = Coeffs::new(
-            to_range(rng.gen()),
-            to_range(rng.gen()),
-            to_range(rng.gen()),
-            to_range(rng.gen()));
-        let bound_function = bind_1(function, &coeffs);
+        coeffs =
+            Coeffs::new( rand_coeff(), rand_coeff(), rand_coeff(), rand_coeff());
 
-        let bounds = find_bounds(&bound_function, 10000);
+        let fn_with_coeffs = bind_1(function, &coeffs);
 
-        let (_, max_exposure) = expose(640, 512, &bounds, 10000, &bound_function);
+        let bounds = find_bounds(&fn_with_coeffs, 10000);
+
+        let (_, max_exposure) =
+            expose(640, 512, &bounds, 10000, &fn_with_coeffs);
+
         if max_exposure < 10 {
             break;
         }
@@ -86,18 +120,12 @@ fn main() -> Result<(), image::ImageError> {
 
     println!("Bounds: {}", bounds);
 
-    let (bitmap, max_exposure) = expose(w, h, &bounds,iters, &f);
+    let (bitmap, max_exposure) =
+        expose(w, h, &bounds,iters, &f);
 
     println!("Max exposure: {}", max_exposure);
 
-    let mut image = image::RgbImage::new(w as u32, h as u32);
-
-    for y in 0..h {
-        for x in 0..w {
-            let c = max(0, min(bitmap.point(x,y), 255)) as u8;
-            image.put_pixel(x as u32, y as u32, image::Rgb([c, c, c]));
-        }
-    }
-
+    let image =
+        develop(&bitmap, max_exposure, 1.5, &palettes::get_palettes()[0]);
     image.save("output.png")
 }
