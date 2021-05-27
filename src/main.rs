@@ -19,7 +19,8 @@ mod palettes;
 
 fn expose<F>(width: usize, height: usize, bounds: &Rect,
             iterations: usize,
-            function: &F) -> (DeepBitmap, u32)
+            function: &F,
+            log: bool) -> (DeepBitmap, u32)
     where F: Fn(&Coord) -> Coord {
 
     let mut bitmap = DeepBitmap::new(width, height);
@@ -32,11 +33,13 @@ fn expose<F>(width: usize, height: usize, bounds: &Rect,
 
     let reset = iterations / 10;
 
-    print!("Exposing");
-    stdout().flush().ok();
+    if log {
+        print!("Exposing");
+        stdout().flush().ok();
+    }
 
     for iter in 0..iterations {
-        if iter % reset == 0 {
+        if log && (iter % reset == 0) {
             print!(".");
             stdout().flush().ok();
         }
@@ -55,7 +58,9 @@ fn expose<F>(width: usize, height: usize, bounds: &Rect,
             bitmap.plot(plot_x, plot_y, sampled);
         }
     }
-    println!();
+    if log {
+        println!();
+    }
     (bitmap, max_exposure)
 }
 
@@ -94,7 +99,7 @@ fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
         let bounds = find_bounds(&fn_with_coeffs, 10000);
 
         let (_, max_exposure) =
-            expose(640, 512, &bounds, 10000, &fn_with_coeffs);
+            expose(640, 512, &bounds, 10000, &fn_with_coeffs, false);
 
         if max_exposure < 10 {
             break;
@@ -104,30 +109,39 @@ fn find_interesting_coeffs<F>(function: &F ) -> Coeffs
     coeffs
 }
 
+fn pick<T>(collection: &Vec<T>) -> &T {
+    let size = collection.len();
+    let index = rand::thread_rng().gen::<u32>() as usize % size;
+    &collection[index]
+}
+
 fn main() -> Result<(), image::ImageError> {
 
-    let w = 1920*2;
-    let h = 1080*2;
-    let iters = 500000000;
-    
+    let w = 1920;
+    let h = 1080;
+    let iters = 100000000;
+  
+    let functions = get_functions();
+    let (function_name, function) = pick(&functions);
+   
+    println!("Using {}", function_name);
     println!("Finding interesting coefficients...");
-    let c = find_interesting_coeffs(&clifford_attractor);
+    let c = find_interesting_coeffs(&function);
 
     println!("Using coefficients: {}", c);
-    let f = bind_1(&clifford_attractor, &c);
+    let f = bind_1(&function, &c);
 
     let bounds = find_bounds(&f, 10000);
 
     println!("Bounds: {}", bounds);
 
     let (bitmap, max_exposure) =
-        expose(w, h, &bounds,iters, &f);
+        expose(w, h, &bounds,iters, &f, true);
 
     println!("Max exposure: {}", max_exposure);
 
     let palettes = palettes::get_palettes();
-    let palette_index: usize = rand::thread_rng().gen::<u32>() as usize % palettes.len();
-    let chosen_palette = &palettes[palette_index];
+    let chosen_palette = pick(&palettes);
     println!("Developing with palette {}", &chosen_palette.name);
 
     let image =
