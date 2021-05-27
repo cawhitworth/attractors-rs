@@ -35,15 +35,23 @@ pub fn peter_de_jong_attractor(p: &Coord, coeffs: &Coeffs) -> Coord {
     }
 }
 
+pub fn experimental(p: &Coord, coeffs: &Coeffs) -> Coord {
+    Coord {
+        x: coeffs.c * f64::sin(coeffs.a * (p.x + p.y)) - coeffs.d * f64::cos(coeffs.b * (p.y - p.x)),
+        y: coeffs.d * f64::sin(coeffs.a * (p.x - p.y)) - coeffs.c * f64::cos(coeffs.b * (p.y + p.x)),
+    }
+}
+
 pub fn get_functions() -> Vec<(&'static str, fn(&Coord, &Coeffs) -> Coord)> {
     vec![
         ("Clifford", clifford_attractor),
-        ("Peter de Jong", peter_de_jong_attractor)
+        ("Peter de Jong", peter_de_jong_attractor),
+        ("Experiemental", experimental),
     ]
 }
 
-pub fn bind_1<'a, T, U, F>(function: &'a F, u: &'a U) -> impl Fn(&T) -> T + 'a 
-    where F: Fn(&T, &U) -> T {
+pub fn bind_1<'a, T, U, V, F>(function: &'a F, u: &'a U) -> impl Fn(&T) -> V + 'a 
+    where F: Fn(&T, &U) -> V {
     move |t| function(t,u)
 }
 
