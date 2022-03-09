@@ -120,7 +120,7 @@ fn main() -> Result<(), image::ImageError> {
 
     let w = 1920;
     let h = 1080;
-    let iters = 100000000;
+    let iters = 100 * 1000 * 1000;
   
     let functions = get_functions();
     let (function_name, function) = pick(&functions);
@@ -144,6 +144,6 @@ fn main() -> Result<(), image::ImageError> {
     println!("Developing with palette {}", &chosen_palette.name);
 
     let image =
-        develop(&bitmap, max_exposure, 1.5, chosen_palette);
+        develop(&bitmap, max_exposure, 2.0, chosen_palette);
     image.save("output.png")
 }
