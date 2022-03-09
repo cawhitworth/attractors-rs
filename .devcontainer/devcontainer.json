@@ -1,0 +1,4 @@
+{
+    "build": {"dockerfile": "Dockerfile"},
+    "extensions": [ "matklad.rust-analyzer" ]
+}
