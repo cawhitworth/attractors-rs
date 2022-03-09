@@ -45,24 +45,5 @@ pub fn get_palettes() -> Vec<Gradient> {
             GradientPoint::new( 0.4, image::Rgb([64, 0, 127])),
             GradientPoint::new( 1.0, image::Rgb([0,0,0]))
         ]),
-        Gradient::new("PurpleBlue", vec![
-            GradientPoint::new( 0.0, image::Rgb([0, 0, 25])),
-            GradientPoint::new( 0.1, image::Rgb([0, 0, 125])),
-            GradientPoint::new( 0.2, image::Rgb([50, 0, 175])),
-            GradientPoint::new( 0.4, image::Rgb([100, 0, 255])),
-            GradientPoint::new( 1.0, image::Rgb([255, 0, 255])),
-        ]),
-        Gradient::new("PetrolOlive", vec![
-                GradientPoint::new( 0.0, image::Rgb([3, 14, 14])),
-                GradientPoint::new( 0.1, image::Rgb([34, 145, 140])),
-                GradientPoint::new( 0.2, image::Rgb([85, 145, 48])),
-                GradientPoint::new( 0.5, image::Rgb([38, 65, 22])),
-                GradientPoint::new( 1.0, image::Rgb([0,0,0]))
-        ]),
-        Gradient::new("PastelPink", vec![
-            GradientPoint::new( 0.0, image::Rgb([200, 180, 180])),
-            GradientPoint::new( 0.01, image::Rgb([255, 230, 230])),
-            GradientPoint::new( 0.1, image::Rgb([230, 200, 200])),
-            GradientPoint::new( 1.0, image::Rgb([180, 150, 150]))
-        ])]
+    ]
 }
