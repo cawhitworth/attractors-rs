@@ -120,11 +120,7 @@ fn main() -> Result<(), image::ImageError> {
 
     let w = 1920;
     let h = 1080;
-<<<<<<< Updated upstream
-    let iters = 100 * 1000 * 1000;
-=======
-    let iters = 1000000000;
->>>>>>> Stashed changes
+    let iters = 10 * 1000 * 1000;
   
     let functions = get_functions();
     let (function_name, function) = pick(&functions);
